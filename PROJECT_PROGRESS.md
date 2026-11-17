@@ -141,6 +141,43 @@ The selected primary model is a histogram gradient-boosted classifier with:
 
 Its validation ROC-AUC is 0.530642.
 
+## Optional expanded model study
+
+The notebook now contains an additional validation-only model spectrum. It is disabled by default so a normal notebook run does not train the computationally heavier models:
+
+```python
+RUN_EXPANDED_MODEL_STUDY = False
+```
+
+Set this flag to `True` only when intentionally running the optional study. It does not replace the frozen primary model and must not be used to retroactively tune against the already inspected 2016 test year.
+
+The optional direction-classification comparison includes:
+
+- Majority baseline
+- Logistic regression
+- Shrinkage linear discriminant analysis
+- Extra Trees classifier
+- Random Forest classifier
+- Histogram gradient-boosted classifier
+- Small, early-stopped multilayer perceptron
+
+The optional continuous-return comparison predicts `next_return` with:
+
+- Mean-return baseline
+- Ordinary linear regression
+- Ridge regression
+- Elastic Net
+- Huber robust regression
+- Extra Trees regressor
+- Random Forest regressor
+- Histogram gradient-boosted regressor
+
+Each family compares stock-only and stock-plus-sector features on identical rows. Regression metrics include MAE, RMSE, R-squared, Pearson correlation, Spearman rank correlation, directional accuracy, directional ROC-AUC, and a gross validation strategy return and Sharpe ratio.
+
+The optional study also contains univariate ordinary-least-squares and standardized Ridge experiments for the 1-, 5-, and 20-session returns and both sector-relative returns. The sign of each fitted slope is used to describe momentum versus mean reversion.
+
+The expanded model code is a post-hoc research extension. Because the 2016 outcomes were already inspected before it was added, its model choices should remain validation-only unless a genuinely new confirmation period is obtained.
+
 ## Held-out test results
 
 After selection, the four chosen model configurations and the baseline were refit on the combined 2010–2015 rows and evaluated once on the same 2016 test rows.
