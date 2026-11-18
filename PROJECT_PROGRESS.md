@@ -1,6 +1,13 @@
 # Project progress
 
-The project now uses the SPY hourly notebook and `spy_hourly_audit.py`.
+The project is the SPY hourly notebook alone. The audit and research helper
+code and all 30 tests now live in its cells; the former `spy_hourly_audit.py`,
+`spy_hourly_research.py` and test files were merged into it and removed, and
+the README's run instructions are in notebook section 1.
+
+Data window: the hourly snapshot starts 2016-06-28. Pulling data all the way
+back to 2010 is expensive, so the study is capped at the data we could get.
+
 The earlier daily-stock notebook, its seven implementation scripts, four test
 scripts and optional Metal requirements file have been removed. Dependencies
 and run instructions now describe the SPY workflow. Existing data and ignored
@@ -8,17 +15,15 @@ generated artifacts were preserved; current reports are under
 `artifacts/spy_hourly_audit/`.
 
 Retirement removed 1,810 production Python lines and 879 test lines (2,689
-total; zero added Python lines). The SPY notebook, implementation and tests
-are byte-for-byte unchanged. `uv run --no-project python -m unittest discover
--v` passes all 14 remaining tests; Ruff format/lint, notebook schema validation,
-and the saved audit fingerprint also pass. No references to the deleted modules
-remain in the active source or documentation.
+total; zero added Python lines). At that point the SPY
+notebook, implementation and tests were unchanged and its 14 tests passed. No
+references to the deleted modules remain in the active source or documentation.
 
 ## SPY hourly notebook: measured repair audit
 
 Investigated the newly pulled teammate notebook using only its existing raw
-parquet, processed parquet and SQLite feature search. `spy_hourly_audit.py`
-owns the controlled experiment, session-aware indicators, cash/share ledger
+parquet, processed parquet and SQLite feature search. the audit helper cells
+in section 13 own the controlled experiment, session-aware indicators, cash/share ledger
 and nested chronological re-selection. Notebook sections 13–14 contain executed
 tables and plots; the original code and saved numeric outputs remain available
 as provenance. Corrected stale markdown claiming a 43.30% all-feature result:
@@ -71,16 +76,12 @@ No model is promoted based on these diagnostics.
 Fourteen regression tests pass: analytic indicator parity, sessions/DST/missing
 hours, future-price mutation, fixed-share short compounding, gap ownership,
 flat entry, exact entry/exit fees, buy-and-hold parity, daily risk grouping,
-and strict inner/outer/next-open label availability. Validation commands:
-
-```sh
-uv run --no-project python -m unittest -v test_spy_hourly_audit
-uv tool run ruff format --check spy_hourly_audit.py test_spy_hourly_audit.py
-uv tool run ruff check spy_hourly_audit.py test_spy_hourly_audit.py
-```
+and strict inner/outer/next-open label availability. They run in the notebook
+cell after section 14.
 
 The full audit completed and all three input SHA256 hashes were unchanged.
-Cached report reuse requires matching source/input/config/runtime fingerprints.
+Cached report reuse requires matching source/input/config/runtime fingerprints
+(the source fingerprint hashes the helper functions' code in the notebook).
 Generated reports, paths and cutoff audits live in ignored
 `artifacts/spy_hourly_audit/`; the appended notebook sections need no Polars
 installation or download cells. Notebook validation and new saved outputs pass.
@@ -89,7 +90,7 @@ repaired execution have different contracts.
 
 ## Controlled probability, selection, feature and policy improvements
 
-`spy_hourly_research.py` reuses the canonical feature clocks, logistic fitting
+The research helper cells in section 15 reuse the canonical feature clocks, logistic fitting
 and cash/share ledger from the repair audit. Notebook sections 15–17 execute
 the new study independently. The target is open-to-following-observed-open
 direction; all seven arms use the same 25,923 outer bars from 2020 onward and
@@ -174,18 +175,24 @@ sklearn score parity, analytic feature/risk formulas, normalization, causal
 mutation, extra delay, zero activity/range, policy boundaries, disjoint folds,
 label purging at validation ends, one-standard-error selection, rejection of
 inconsistent candidates, validation-only thresholds, training-only scaling,
-and fallback priors. Run commands:
+and fallback priors. The 16 research tests run in the notebook cell after
+section 17.
 
-```sh
-uv run --no-project python spy_hourly_research.py
-uv run --no-project python -m unittest discover -v
-uv tool run ruff check spy_hourly_audit.py spy_hourly_research.py test_spy_hourly_audit.py test_spy_hourly_research.py
-```
-
-The isolated study adds 597 implementation lines and 236 test lines. The
-previous audit's code, public behavior and saved results remain intact.
+The isolated study adds 597 implementation lines and 236 test lines, now
+notebook cells. The previous audit's behavior and saved results remain intact.
 Generated probabilities, candidate folds, cutoffs, coefficients, paths,
 calibration bins, annual returns and a fingerprinted report are under ignored
 `artifacts/spy_hourly_research/`. The implemented diagnostics are useful even
 though the prespecified selection changes did not produce a consistent
 economic improvement; this is an inconclusive historical research result.
+
+## Notebook consolidation
+
+The helper modules and their tests were merged into the notebook as ten cells
+(four audit helpers, audit tests, four research helpers, research tests); the
+README's explanatory content moved into section 1, and a few redundant
+sentences and unused imports were removed. The `positions` helper was renamed
+`policy_positions` to avoid clashing with a baseline-section variable. After the
+merge the whole notebook was re-executed from scratch with the audit and study
+recomputed: every saved number is reproduced and all 30 tests pass (14 audit,
+16 research).
